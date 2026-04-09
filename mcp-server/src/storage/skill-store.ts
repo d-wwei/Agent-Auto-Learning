@@ -1,5 +1,5 @@
 import type Database from "better-sqlite3";
-import { writeFileSync, readFileSync, existsSync, mkdirSync, rmSync } from "fs";
+import { writeFileSync, readFileSync, existsSync, mkdirSync } from "fs";
 import { join } from "path";
 import { parse as parseYaml } from "yaml";
 import type { Config } from "../config.js";
