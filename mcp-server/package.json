@@ -12,7 +12,9 @@
     "dev": "tsc --watch",
     "start": "node dist/index.js",
     "test": "node --experimental-vm-modules node_modules/.bin/jest",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "dashboard": "node dist/dashboard.js",
+    "dashboard:html": "node dist/dashboard.js --html"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
