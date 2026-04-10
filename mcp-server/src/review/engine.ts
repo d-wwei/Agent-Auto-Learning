@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { Config } from "../config.js";
-import type { MemoryStore } from "../storage/memory-store.js";
+import type { MemoryProvider } from "../providers/memory-provider.js";
 import type { SkillStore } from "../storage/skill-store.js";
 import type { SessionStore } from "../storage/session-store.js";
 
@@ -57,7 +57,7 @@ export class ReviewEngine {
 
   async review(
     conversationSummary: string,
-    memoryStore: MemoryStore,
+    memoryProvider: MemoryProvider,
     skillStore: SkillStore,
     sessionStore: SessionStore,
   ): Promise<ReviewResult> {
@@ -92,7 +92,7 @@ export class ReviewEngine {
     for (const mem of parsed.memories ?? []) {
       try {
         const validType = ["preference", "fact", "feedback"].includes(mem.type) ? mem.type as "preference" | "fact" | "feedback" : "fact";
-        memoryStore.write({
+        await memoryProvider.write({
           type: validType,
           content: mem.content,
           tags: mem.tags ?? [],

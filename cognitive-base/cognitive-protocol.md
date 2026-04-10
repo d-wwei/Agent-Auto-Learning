@@ -26,3 +26,11 @@ These rules are always active. They apply to every task regardless of domain.
 - Did I persist every correction, discovery, and preference from this session?
 - If this was complex work, did I submit a review?
 - Will the next agent session on a similar task perform better because of what I saved?
+
+## Memory Provider Awareness
+
+The learning system may delegate memory to an external system (e.g., Agent Recall).
+Use `learning_status` to check which `memory_provider` is active.
+
+- When provider is external: `delete` and `gc` may return "not_supported" — this is normal.
+- Regardless of provider, always use the same `learn` and `recall` tools — routing is automatic.

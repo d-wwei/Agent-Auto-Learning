@@ -1,13 +1,13 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { MemoryStore } from "../storage/memory-store.js";
+import type { MemoryProvider } from "../providers/memory-provider.js";
 import type { SkillStore } from "../storage/skill-store.js";
 import type { SessionStore } from "../storage/session-store.js";
 import type { ReviewEngine } from "../review/engine.js";
 
 export function registerHighLevelTools(
   server: McpServer,
-  memoryStore: MemoryStore,
+  memoryProvider: MemoryProvider,
   skillStore: SkillStore,
   sessionStore: SessionStore,
   reviewEngine: ReviewEngine,
@@ -22,7 +22,7 @@ export function registerHighLevelTools(
     },
     async ({ query, limit }) => {
       try {
-        const memories = memoryStore.search(query, { limit: limit ?? 5 });
+        const memories = await memoryProvider.search(query, { limit: limit ?? 5 });
         const allSkills = skillStore.list();
 
         // Simple keyword matching for skills
@@ -112,7 +112,7 @@ export function registerHighLevelTools(
           case "memory": {
             if (!params.type) throw new Error("'type' is required for action=memory");
             if (!params.content) throw new Error("'content' is required for action=memory");
-            const result = memoryStore.write({
+            const result = await memoryProvider.write({
               type: params.type,
               content: params.content,
               tags: params.tags,
@@ -138,7 +138,7 @@ export function registerHighLevelTools(
                 ],
               };
             }
-            const result = await reviewEngine.review(params.content, memoryStore, skillStore, sessionStore);
+            const result = await reviewEngine.review(params.content, memoryProvider, skillStore, sessionStore);
             return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
           }
 
@@ -160,12 +160,12 @@ export function registerHighLevelTools(
 
           case "delete": {
             if (!params.id) throw new Error("'id' is required for action=delete");
-            const result = memoryStore.delete(params.id);
+            const result = await memoryProvider.delete(params.id);
             return { content: [{ type: "text" as const, text: JSON.stringify(result) }] };
           }
 
           case "gc": {
-            const result = memoryStore.gc({ maxAgeDays: params.max_age_days, dryRun: params.dry_run });
+            const result = await memoryProvider.gc({ maxAgeDays: params.max_age_days, dryRun: params.dry_run });
             return { content: [{ type: "text" as const, text: JSON.stringify(result) }] };
           }
 
@@ -195,7 +195,8 @@ export function registerHighLevelTools(
             type: "text" as const,
             text: JSON.stringify(
               {
-                memory_count: memoryStore.count(),
+                memory_count: await memoryProvider.count(),
+                memory_provider: memoryProvider.info(),
                 skill_count: skillStore.count(),
                 session_count: sessionStore.count(),
                 review_engine: reviewEngine.available ? "active" : "inactive (no API key)",

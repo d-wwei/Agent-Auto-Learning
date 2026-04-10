@@ -7,6 +7,7 @@ import { MemoryStore } from "./storage/memory-store.js";
 import { SkillStore } from "./storage/skill-store.js";
 import { SessionStore } from "./storage/session-store.js";
 import { ReviewEngine } from "./review/engine.js";
+import { detectMemoryProvider } from "./providers/index.js";
 import { registerHighLevelTools } from "./tools/high-level-tools.js";
 
 async function main() {
@@ -17,17 +18,19 @@ async function main() {
   const sessionStore = new SessionStore(db, config);
   const reviewEngine = new ReviewEngine(config);
 
+  const memoryProvider = await detectMemoryProvider(config, memoryStore);
+
   const server = new McpServer({
     name: "auto-learning",
-    version: "0.2.0",
+    version: "0.3.0",
   });
 
-  registerHighLevelTools(server, memoryStore, skillStore, sessionStore, reviewEngine);
+  registerHighLevelTools(server, memoryProvider, skillStore, sessionStore, reviewEngine);
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
 
-  console.error("auto-learning-mcp v0.2.0: connected (3 tools: recall, learn, learning_status)");
+  console.error(`auto-learning-mcp v0.3.0: connected (3 tools) memory_provider=${memoryProvider.info().name}`);
 }
 
 main().catch((err) => {

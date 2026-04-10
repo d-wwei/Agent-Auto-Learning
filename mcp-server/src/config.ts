@@ -20,6 +20,14 @@ export interface Config {
     skillDescMaxLen: number;
     skillFileMaxBytes: number;
   };
+  memory: {
+    provider: "auto" | "builtin" | "agent-recall";
+    agentRecall: {
+      url: string;
+      project: string;
+      timeoutMs: number;
+    };
+  };
 }
 
 const DEFAULT_DATA_DIR = join(homedir(), ".auto-learning");
@@ -41,6 +49,14 @@ const DEFAULT_CONFIG: Config = {
     skillDescMaxLen: 1024,
     skillFileMaxBytes: 1_048_576,
   },
+  memory: {
+    provider: "auto",
+    agentRecall: {
+      url: "http://localhost:37777",
+      project: "auto-learning",
+      timeoutMs: 3000,
+    },
+  },
 };
 
 export function loadConfig(): Config {
@@ -56,6 +72,11 @@ export function loadConfig(): Config {
     dataDir: userConfig.dataDir ?? DEFAULT_CONFIG.dataDir,
     review: { ...DEFAULT_CONFIG.review, ...userConfig.review },
     limits: { ...DEFAULT_CONFIG.limits, ...userConfig.limits },
+    memory: {
+      ...DEFAULT_CONFIG.memory,
+      ...userConfig.memory,
+      agentRecall: { ...DEFAULT_CONFIG.memory.agentRecall, ...(userConfig.memory as Config["memory"] | undefined)?.agentRecall },
+    },
   };
 
   for (const sub of ["memory/preferences", "memory/facts", "memory/feedback", "skills", "sessions"]) {

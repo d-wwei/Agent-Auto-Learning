@@ -2,14 +2,14 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { SessionStore } from "../storage/session-store.js";
 import type { ReviewEngine } from "../review/engine.js";
-import type { MemoryStore } from "../storage/memory-store.js";
+import type { MemoryProvider } from "../providers/memory-provider.js";
 import type { SkillStore } from "../storage/skill-store.js";
 
 export function registerSessionTools(
   server: McpServer,
   sessionStore: SessionStore,
   reviewEngine: ReviewEngine,
-  memoryStore: MemoryStore,
+  memoryProvider: MemoryProvider,
   skillStore: SkillStore,
 ) {
   server.tool(
@@ -34,7 +34,7 @@ export function registerSessionTools(
         };
       }
 
-      const result = await reviewEngine.review(conversation_summary, memoryStore, skillStore, sessionStore);
+      const result = await reviewEngine.review(conversation_summary, memoryProvider, skillStore, sessionStore);
       return { content: [{ type: "text" as const, text: JSON.stringify(result) }] };
     },
   );
