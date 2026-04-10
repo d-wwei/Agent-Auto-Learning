@@ -1,16 +1,18 @@
 {
   "name": "auto-learning-mcp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "MCP server for agent self-learning — memory, skills, and session review",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "auto-learning-mcp": "dist/index.js"
+    "auto-learning-mcp": "dist/index.js",
+    "auto-learning-setup": "dist/setup.js"
   },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
     "start": "node dist/index.js",
+    "setup": "node dist/setup.js",
     "test": "node --experimental-vm-modules node_modules/.bin/jest",
     "clean": "rm -rf dist",
     "dashboard": "node dist/dashboard.js",
